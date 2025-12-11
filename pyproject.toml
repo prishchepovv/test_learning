@@ -1,0 +1,24 @@
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "tests"
+]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
+addopts = [
+    "-v",                                  # Более детальнеый вывод
+    "-ra",                                 # Показать допольнительную информацию о пропущенных, xfailed, xpassed тестах
+    "--tb=short",                          # Короткий формат трейсбеков
+    "--strict-markers",                    # Выдавать ошибку, если используется незарегистрированный маркер
+    "--import-mode=importlib"              # Рекомендованный реждим импорта [2]
+]
+
+markers = [
+    "smoke: smoke tests for critical functionality",
+    "regression: full regression suite",
+    "web: web UI tests",
+    "mobile: mobile app tests",
+    "api: API tests"
+]

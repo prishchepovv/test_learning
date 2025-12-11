@@ -1,0 +1,17 @@
+# Core testing framework
+pytest==7.4.2
+
+# Web testing
+selenium==4.14.0
+
+# Mobile testing
+Appium-Python-Client==2.11.1
+
+# API testing
+requests==2.31.0
+
+# Allure reporting
+allure-pytest==2.13.2
+
+# Utility for environment variables
+python-dotenv==1.0.0
