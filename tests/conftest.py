@@ -47,3 +47,14 @@ def api_session():
     yield session
     print("\n--- Closing API session ---")
     session.close()
+
+    # Сохранение скриншота при падении теста
+    @pytest.fixture(autouse=True)
+    def take_screenshot_on_failure(request, driver):
+        """Делает скриншот при падении теста"""
+        yield
+        if request.node.rep_call.failed:
+        # Сохраняем скриншот
+            screenshot_name = f"screenshot/{request.node.name}_fail.png"
+            driver.save_screenshot(screenshot_name)
+            print(f"Скриншот сохранен: {screenshot_name}")

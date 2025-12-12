@@ -8,11 +8,11 @@ def test_gruzapp_main_page(driver):
     """Проверяет, что заголовок страницы Грузапп корректен."""
 
     # Открываем страницу
-    driver.get("https://front-marketing.gruzapp.team/")
+    driver.get("https://gruz.app/")
 
     # Ждем загрузки страницы
     WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.TAG_NAME, "body"))
+        EC.invisibility_of_element_located((By.ID, "loading-spinner"))
     )
 
     # Гибкая проверка title (не точный текст, а ключевые слова)
