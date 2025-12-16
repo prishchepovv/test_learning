@@ -1,8 +1,6 @@
-from asyncio import timeout
-from cgitb import text
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from src.qa_framework.config import DEFAULT_TIMEOUT
 import logging
 import time
 
@@ -12,76 +10,60 @@ class BasePage:
 
     def __init__(self, driver):
         self.driver = driver
-        self.wait = WebDriverWait(driver, 10)
-        self.logger = logging.getLogger(__name__)
+        self.wait = WebDriverWait(driver, DEFAULT_TIMEOUT)
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     def open(self, url):
         self.driver.get(url)
         self.logger.info(f"Открыта страница: {url}")
 
-    def find_element(self, locator, timeout=None):
+    def find_element(self, locator, timeout=DEFAULT_TIMEOUT):
         """Найти элемент с ожиданием"""
-        wait = self.wait if timeout is None else WebDriverWait(self.driver, timeout)
-        try:
-            return wait.until(EC.presence_of_all_elements_located(locator))
-        except TimeoutException:
-            self.logger.error(f"Элемент не найден: {locator}")
-            return []
+        return WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_element_located(locator)
+        )
 
-    def click_element(self, locator, timeout=None):
+    def find_elements(self, locator, timeout=DEFAULT_TIMEOUT):
+        return WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_all_elements_located(locator)
+        )
+
+    def click(self, locator, timeout=DEFAULT_TIMEOUT):
         """Кликнуть с ожиданием кликабельности"""
-        wait = self.wait if timeout is None else WebDriverWait(self.driver, timeout)
-        try:
-            element = wait.until(EC.element_to_be_clickable(locator))
-            element.click()
-            self.logger.info(f"Кликнут элемент: {locator}")
-        except TimeoutException:
-            self.logger.error(f"Элемент не кликабелен: {locator}")
-            raise
+        element = WebDriverWait(self.driver, timeout).until(
+            EC.element_to_be_clickable(locator)
+        )
+        element.click()
+        self.logger.info(f"Кликнуть элемент: {locator}")
 
-    def get_text(self, locator):
+    def get_text(self, locator, timeout=DEFAULT_TIMEOUT):
         """Получить текст элемента"""
-        element = self.find_element(locator, timeout)
-        return element.text
+        return self.find_element(locator, timeout).text
 
-    def send_keys(self, locator, keys, timeout=None, clear=True):
-        """Ввести текст в элемент"""
+    def type(self, locator, text, timeout=DEFAULT_TIMEOUT, clear=True):
         element = self.find_element(locator, timeout)
         if clear:
             element.clear()
         element.send_keys(text)
-        self.logger.info(f"Введен текст в элемент {locator}: {text}")
+        self.logger.info(f"Type text into {locator}: {text}")
 
-    def is_element_present(self, locator, timeout=None):
-        """Проверить наличие элемента"""
+    def is_visible(self, locator, timeout=DEFAULT_TIMEOUT):
         try:
-            self.find_element(locator, timeout)
+            WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(locator)
+            )
             return True
-        except (TimeoutException, NoSuchElementException):
+        except Exceptions:
             return False
 
-    def is_element_visible(self, locator, timeout=None):
-        """Проверить видимость элемента"""
-        wait = self.wait if timeout is None else WebDriverWait(self.driver, timeout)
-        try:
-            wait.until(EC.visibility_of_element_located(locator))
-            return True
-        except TimeoutException:
-            return False
-
-    def wait_for_element_to_disappear(self, locator, timeout=None):
-        """Ожидать исчезновения элемента"""
-        wait = self.wait if timeout is None else WebDriverWait(self.driver, timeout)
-        try:
-            wait.until(EC.invisibility_of_element_located(locator))
-            return True
-        except TimeoutException:
-            return False
+    def wait_untill_disappear(self, locator, timeout=DEFAULT_TIMEOUT):
+        WebDriverWait(self.driver, timeout).until(
+            EC.invisibility_of_element_located(locator)
+        )
 
     def take_screenshot(self, name):
-        """Сделать скриншот"""
         timestamp = time.strftime("%Y%m%d-%H%M%S")
-        filename = f"screenshots/{name}_{timestamp}.png"
-        self.driver.save_screenshot(filename)
-        self.logger.info(f"Скриншот сохранен: {filename}")
-        return filename
+        path = f"screenshot/{name}_{timestamp}.png"
+        self.driver.save_screenshot(path)
+        self.logger.info(f"Screenshot saved: {path}")
+        return path
