@@ -1,11 +1,11 @@
 import allure
 from selenium.webdriver.common.by import By
 from pages.base_page import BasePage
+from pages.carrier_page import CarrierPage
 
 class MainPage(BasePage):
 
     HEADER = (By.TAG_NAME, "h1")
-    CARRIER_HEADER_HIGH = (By.TAG_NAME, "h1")
     WANT_TO_TRANSPORT_BTN_HIGH = (
         By.CSS_SELECTOR, "a[href*='/hochu-perevozit']"
     )
@@ -19,8 +19,9 @@ class MainPage(BasePage):
         return self.wait_visible(self.HEADER).text
 
     @allure.step("Кликаем на кнопку в шапке 'Хочу перевозить'")
-    def click_want_to_transport(self):
+    def click_want_to_transport(self) -> CarrierPage:
         self.click(self.WANT_TO_TRANSPORT_BTN_HIGH)
+        return CarrierPage(self.driver)
 
     @allure.step("Ждём, что отобразится другая страница после клика")
     def is_carrier_page_loaded(self):

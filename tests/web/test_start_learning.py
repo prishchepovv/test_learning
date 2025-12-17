@@ -16,8 +16,8 @@ def test_main_page_is_header_text(main_page):
 
 @allure.title("Клик по кнопке в шапке 'Хочу перевозить'")
 def test_click_want_to_transport(main_page):
-    main_page.click_want_to_transport()
+    carrier_page = main_page.click_want_to_transport()
 
-    assert main_page.is_carrier_page_loaded(), (
+    assert carrier_page.is_page_loaded(), (
         "Страница перевозчика не загрузилась после клика"
     )
