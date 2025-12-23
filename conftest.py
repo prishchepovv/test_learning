@@ -19,6 +19,11 @@ def main_page(driver):
     page.open(BASE_URL)
     return page
 
+@pytest.fixture
+def calculate_cost_page(driver):
+    page = MainPage(driver)
+    return page.click_calculate_cost_page()
+
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     outcome = yield

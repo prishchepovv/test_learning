@@ -19,3 +19,21 @@ class BasePage:
     def click(self, locator):
         element = wait_clickable(self.driver, locator)
         element.click()
+
+    def get_value(self, locator):
+        return self.wait_visible(locator).get_attribute("value")
+
+    def get_class(self, locator):
+        return self.wait_visible(locator).get_attribute("class")
+
+    def is_enable(self, locator):
+        return self.wait_visible(locator).is_enabled()
+
+    def send_keys(self, locator, value):
+        element = wait_visible(self.driver, locator)
+        element.clear()
+        element.send_keys(value)
+
+    def is_enabled(self, locator):
+        return wait_visible(self.driver, locator).is_enabled()
+

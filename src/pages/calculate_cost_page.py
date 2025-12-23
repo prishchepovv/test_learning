@@ -15,22 +15,30 @@ class CalculateCostPage(BasePage):
     TYPE_RACE_BACK_BTN = (By.XPATH, "//button[span[text()='РЕЙС + ОБРАТКА']]")
 
     # Поля ввода
-    FROM_FIELD = (By.CSS_SELECTOR, "input[placeholder='Город']")
-    TO_FIELD = (By.CSS_SELECTOR, "input[placeholder='Куда']")
+    FROM_FIELD = (By.XPATH, "//p[normalize-space()='Город']/following::input[1]")
+    TO_FIELD = (By.XPATH, "//p[normalize-space()='Куда']/following::input[1]")
     WEIGHT_FIELD = (By.CSS_SELECTOR, "input[placeholder='0'][inputmode='decimal']")
-    PALLETS_FIELD = (by.CSS_SELECTOR, "input[placeholder='0'][inputmode='numeric']")
+    PALLETS_FIELD = (By.CSS_SELECTOR, "input[placeholder='0'][inputmode='numeric']")
     POINTS_FIELD = (By.CSS_SELECTOR, "input[placeholder='0'][inputmode='numeric']")
+
+    @staticmethod
+    def CITY_SUGGESTION(city):
+        return (
+            By.XPATH, f"//p[contains(@class, 'hover:cursor-pointer') and contains(text(), '{city}')]"
+        )
+
 
     # Кнопка рассчитать
     CALCULATE_BTN = (By.CSS_SELECTOR, "button[type='submit']")
 
     # Заголовок страницы
 
-    HEADER = (By.TAG_NAME, "h1")
+    HEADER = (By.TAG_NAME, "h2")
 
     @allure.step("Проверяем, что страница калькулятора загрузилась")
     def is_page_loaded(self):
-        return self.wait_visible(self.HEADER).is_displayed()
+        element = self.wait_visible(self.HEADER)
+        return element.is_displayed()
 
 
     # Действия
@@ -47,13 +55,41 @@ class CalculateCostPage(BasePage):
     def select_race(self):
         self.click(self.TYPE_RACE_BTN)
 
-    @allure.step("Заполняем поле 'Откуда'")
-    def set_from(self):
-        self.send_keys(self.FROM_FIELD, value)
+    @allure.step("Заполняем поле 'Город'")
+    def set_from(self, city):
+        field = self.wait_visible(self.FROM_FIELD)
+        field.clear()
+        field.send_keys(city)
+
+        suggestion = self.wait_visible(self.CITY_SUGGESTION(city))
+        suggestion.click()
+
+    #@allure.step("Кликаем на введенный город в поле 'Откуда'")
+    #def select_city_from_suggestion(self, city):
+        #locator = (By.XPATH, f"//p[contains(text(), {city}]")
+        #element = self.wait_visible(locator)
+        #element.click()
 
     @allure.step("Заполняем поле 'Куда'")
-    def set_to(self):
-        self.send_keys(self.TO_FIELD, value)
+    def set_to(self, city):
+        field = self.wait_visible(self.TO_FIELD)
+        field.clear()
+        field.send_keys(city)
+
+        suggestion = self.wait_visible(self.CITY_SUGGESTION(city))
+        suggestion.click()
+
+    def get_from_value(self):
+        return self.wait_visible(self.FROM_FIELD).get_attribute("value")
+
+    def get_to_value(self):
+        return self.wait_visible(self.TO_FIELD).get_attribute("value")
+
+    #@allure.step("Кликаем на введенный город в поле 'Куда'")
+    #def select_city_to_suggestion(self, city):
+        #locator = (By.XPATH, f"//p[contains(text(), {city}]")
+        #element = self.wait_visible(locator)
+        #element.click()
 
     @allure.step("Заполняем поле 'Вес, кг'")
     def send_weight(self, value):
