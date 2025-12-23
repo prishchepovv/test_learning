@@ -29,6 +29,9 @@ def test_calculate_button_becomes_enabled(main_page):
     page.select_intercity_route()
     page.set_from("Казань")
     page.set_to("Сочи")
+    page.send_weight('1000')
+    page.send_pallets('10')
+    page.points_field('2')
 
     assert page.is_enabled(page.CALCULATE_BTN), \
     "Кнопка 'Рассчитать' не активировалась"
@@ -39,6 +42,8 @@ def test_do_calculate(main_page):
     page.select_intercity_route()
     page.set_from("Новосибирск")
     page.set_to("Омск")
-    page.set_weight("100")
+    page.send_weight('1000')
+    page.send_pallets('10')
+    page.points_field('2')
     page.submit()
     assert True
